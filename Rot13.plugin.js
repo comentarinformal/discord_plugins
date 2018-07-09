@@ -1,4 +1,4 @@
-//META{"name":"Rot13"}*//
+//META{"name":"Rot13","website":"https://github.com/comentarinformal/discord_plugins","source":"https://github.com/comentarinformal/discord_plugins/blob/master/Rot13.plugin.js"}*//
 
 /*
  ====== Installation ======
