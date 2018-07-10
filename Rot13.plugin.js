@@ -16,8 +16,14 @@ Rot13.prototype.getName = function() {return "Rot13 Thingamagicky";};
 Rot13.prototype.getDescription = function() {return "You probably guess what it does. /rot13 or /rot <text>. Hold CTRL to avoid auto-sending the message, for 'decryption'. ";};
 Rot13.prototype.getVersion = function() {return "1.9";};
 Rot13.prototype.getAuthor = function() {return "Coment";};
+Rot13.prototype.getRawURL = function() {return 'https://raw.githubusercontent.com/comentarinformal/discord_plugins/master/Rot13.plugin.js';};
 
-Rot13.prototype.load = function() {this.attachHandler();};
+Rot13.prototype.setUpUpdater = function(){
+	if (typeof window.PluginUpdates !== "object" || !window.PluginUpdates) window.PluginUpdates = {plugins:{}};
+	window.PluginUpdates.plugins[this.getRawURL()] = {name:this.getName(), raw:this.getRawURL(), version:this.getVersion()};
+}
+	
+Rot13.prototype.load = function() {this.attachHandler();this.setUpUpdater();};
 Rot13.prototype.start = function() {this.attachHandler();this.handleChat()};
 Rot13.prototype.onSwitch = function(){/*this.start();*/}
 
@@ -33,7 +39,6 @@ Rot13.prototype.handleChat = function(){
 		
 		$(".message-text .markup").each(function(z,elem) {
 			var msgVal = elem.innerText;
-			//console.log(msgVal);
 			if(msgVal.startsWith('[rot13]')){
 				$(elem).html("[ROT13] <i><b>"+rotate(msgVal.slice(7))+"</b></i>")
 			}
