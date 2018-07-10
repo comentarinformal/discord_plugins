@@ -14,7 +14,7 @@ var Rot13 = function() {};
 
 Rot13.prototype.getName = function() {return "Rot13 Thingamagicky";};
 Rot13.prototype.getDescription = function() {return "You probably guess what it does. /rot13 or /rot <text>. Hold CTRL to avoid auto-sending the message, for 'decryption'. ";};
-Rot13.prototype.getVersion = function() {return "1.8";};
+Rot13.prototype.getVersion = function() {return "1.9";};
 Rot13.prototype.getAuthor = function() {return "Coment";};
 
 Rot13.prototype.load = function() {this.attachHandler();};
@@ -23,7 +23,7 @@ Rot13.prototype.onSwitch = function(){/*this.start();*/}
 
 
 Rot13.prototype.observer = function (e) {
-	if(e.addedNodes.length > 0 && typeof e.addedNodes[0].className !== undefined && e.addedNodes[0].className.indexOf('message') > -1){
+	if(e.addedNodes.length > 0 && typeof e.addedNodes[0].className == 'string' && e.addedNodes[0].className.indexOf('message') > -1){
 		this.handleChat();
 	}
 }
