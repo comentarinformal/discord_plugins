@@ -12,20 +12,37 @@
 
 var Rot13 = function() {};
 
-Rot13.prototype.getName = function() {return "Rot13 Modifier";};
-Rot13.prototype.getDescription = function() {return "You probably guess what it does. /rot13 or /rot <text> to generate the tags. Hover over a rot13-tagged text, or click on it, to translate it. ";};
-Rot13.prototype.getVersion = function() {return "2.1";};
+Rot13.prototype.constructor = function(){this.initialized = false;}
+Rot13.prototype.initialize = function(){
+	PluginUtilities.checkForUpdate(this.getName(), this.getVersion(), 'https://raw.githubusercontent.com/comentarinformal/discord_plugins/master/Rot13.plugin.js');
+	this.attachHandler();
+}
+
+Rot13.prototype.getName = function() {return "Rot13 Stuffer";};
+Rot13.prototype.getDescription = function() {return "/rot13 or /rot <text> to generate the tags. Hover over a rot13-tagged text, or click on it, to translate it.";};
+Rot13.prototype.getVersion = function() {return "2.5rc1";};
 Rot13.prototype.getAuthor = function() {return "Coment";};
 Rot13.prototype.getRawURL = function() {return 'https://raw.githubusercontent.com/comentarinformal/discord_plugins/master/Rot13.plugin.js';};
-
-Rot13.prototype.setUpUpdater = function(){
-	if (typeof window.PluginUpdates !== "object" || !window.PluginUpdates) window.PluginUpdates = {plugins:{}};
-	window.PluginUpdates.plugins[this.getRawURL()] = {name:this.getName(), raw:this.getRawURL(), version:this.getVersion()};
-}
 	
-Rot13.prototype.load = function() {this.attachHandler();this.setUpUpdater();};
-Rot13.prototype.start = function() {this.attachHandler();this.handleChat()};
-Rot13.prototype.onSwitch = function(){/*this.start();*/}
+Rot13.prototype.load = function() {this.attachHandler();};
+Rot13.prototype.start = function() {
+	var libraryScript = document.getElementById('zeresLibraryScript');
+	if (!libraryScript) {
+		libraryScript = document.createElement("script");
+		libraryScript.setAttribute("type", "text/javascript");
+		libraryScript.setAttribute("src", "https://rauenzi.github.io/BetterDiscordAddons/Plugins/PluginLibrary.js");
+		libraryScript.setAttribute("id", "zeresLibraryScript");
+		document.head.appendChild(libraryScript);
+	}
+
+if (window.ZeresLibrary){ this.initialize() } else{ libraryScript.addEventListener("load", () => { this.initialize(); });}
+	
+	this.attachHandler();
+	this.handleChat();
+};
+
+
+Rot13.prototype.onSwitch = function(){this.handleChat();}
 
 
 Rot13.prototype.observer = function (e) {
@@ -37,16 +54,17 @@ Rot13.prototype.observer = function (e) {
 Rot13.prototype.handleChat = function(){
 	setTimeout(function() {
 		
-		$(".message-text .markup").each(function(z,elem) {
+		$(".da-markup").each(function(z,elem) {
 			var msgVal = elem.innerText;
 			//console.log(msgVal);
 			if(msgVal.indexOf('[rot13]') > -1){
 				var encryptedText = msgVal.slice(msgVal.indexOf('[rot13]')+7)
 				var rotatedText = rotate(encryptedText);
+				rotatedText = $("<div>").text(rotatedText).html().replace(/"/g, "&quot;");
 				if(false){ ////If I ever do a Settings to choose wether to auto-translate or not, it will be here
 					$(elem).html(msgVal.slice(0,msgVal.indexOf('[rot13]'))+"<span title='"+rotatedText+"'> [ROT13] <i><b>"+rotatedText+"</b></i></span>")
 				}else {
-					$(elem).html(msgVal.slice(0,msgVal.indexOf('[rot13]'))+"<span title='[ROT13]"+rotatedText+"' onclick='Rot13.switch(this)'><i><b>[ROT13]"+encryptedText+"</b></i></span>")
+					$(elem).html(msgVal.slice(0,msgVal.indexOf('[rot13]'))+`<span title="[ROT13]${rotatedText}" onclick="Rot13.switch(this)"><i><b>[ROT13]${encryptedText}</b></i></span>`)
 				}
 			}
 		});
@@ -86,7 +104,8 @@ function rotate(str){return str.replace(/[a-zA-Z]/g,function(c){return String.fr
 Rot13.switch = function(elem){
 	var text1 = elem.innerText;
 	var text2 = elem.getAttribute('title');
-	elem.innerHTML = "<i><b>"+text2+"</b></i>";
+	text1 = $("<div>").text(text1).html().replace(/"/g, "&quot;");
+	elem.innerHTML = `<i><b>${text2}</b></i>`;
 	elem.setAttribute('title',text1);
 	return true;
 }
